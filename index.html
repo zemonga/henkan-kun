@@ -3,137 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>画像変換くん | 登録不要・安全な一括画像変換ツール</title>
-    <meta name="description" content="ブラウザ完結型でプライバシーに配慮した画像一括変換ツール。PNG、JPG、JPEGを相互に高速変換。サーバー送信なしで安全です。">
+    <title>画像変換くん | 登録不要・安全な一括画像変換ツール（PNG/JPG/JPEG）</title>
+    <meta name="description" content="ブラウザ完結型でプライバシーに配慮した画像一括変換ツール。PNG、JPG、JPEGを相互に高速変換。サーバーに画像を送信しないため機密情報も安全です。東大生開発の爆速アルゴリズム採用。">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
-        :root { 
-            --primary: #007bff; --success: #28a745; --warning: #fd7e14; 
-            --danger: #dc3545; --bg: #f4f7f9; --card: #ffffff;
-            --text: #333; --border: #e0e4e8;
-        }
-        
-        body { font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif; background: var(--bg); color: var(--text); margin: 0; line-height: 1.6; }
-
-        /* 3カラムレイアウト */
-        .main-wrapper {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            padding: 20px;
-            max-width: 1400px;
-            margin: auto;
-        }
-
-        /* サイドバー（広告枠） */
-        .ad-sidebar {
-            width: 160px;
-            min-width: 160px;
-            background: #dfe4ea;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 10px;
-            border: 1px dashed #adb5bd;
-            color: #6c757d;
-            font-size: 13px;
-            height: 600px;
-            position: sticky;
-            top: 20px;
-        }
-
-        /* メインコンテンツ */
-        .container { 
-            flex: 1;
-            max-width: 750px; 
-            background: var(--card); 
-            padding: 40px; 
-            border-radius: 20px; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
-            text-align: center;
-        }
-
-        @media (max-width: 1150px) {
-            .ad-sidebar { display: none; }
-            .main-wrapper { padding: 10px; }
-        }
-
+        :root { --primary: #007bff; --success: #28a745; --warning: #fd7e14; --danger: #dc3545; --bg: #f4f7f9; --card: #ffffff; --text: #333; --border: #e0e4e8; }
+        body { font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif; background: var(--bg); color: var(--text); margin: 0; line-height: 1.6; }
+        .main-wrapper { display: flex; justify-content: center; gap: 20px; padding: 20px; max-width: 1400px; margin: auto; }
+        .ad-sidebar { width: 160px; min-width: 160px; background: #dfe4ea; display: flex; align-items: center; justify-content: center; border-radius: 10px; border: 1px dashed #adb5bd; color: #6c757d; font-size: 13px; height: 600px; position: sticky; top: 20px; }
+        .container { flex: 1; max-width: 750px; background: var(--card); padding: 40px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.05); text-align: center; }
+        @media (max-width: 1150px) { .ad-sidebar { display: none; } .main-wrapper { padding: 10px; } }
         header h1 { font-size: 2.2em; color: #222; margin: 0 0 10px 0; }
-        header p { color: #666; margin-bottom: 30px; }
-
-        /* アップロードエリア */
-        #drop-label {
-            display: block;
-            border: 2px dashed var(--primary);
-            border-radius: 15px;
-            padding: 50px 20px;
-            cursor: pointer;
-            background: #f0f7ff;
-            transition: all 0.3s ease;
-            margin-bottom: 25px;
-        }
-        #drop-label:hover, #drop-label.highlight { background: #e1efff; border-color: #0056b3; transform: translateY(-2px); }
-        #drop-label strong { font-size: 1.2em; color: var(--primary); }
-
-        /* ステータスとリスト */
+        #drop-label { display: block; border: 2px dashed var(--primary); border-radius: 15px; padding: 50px 20px; cursor: pointer; background: #f0f7ff; transition: 0.3s; margin-bottom: 25px; }
+        #drop-label:hover { background: #e1efff; border-color: #0056b3; }
         #status { font-weight: bold; color: var(--primary); margin: 20px 0; min-height: 1.5em; }
         #file-list { text-align: left; margin-bottom: 20px; border: 1px solid var(--border); border-radius: 10px; max-height: 300px; overflow-y: auto; background: #fafafa; }
         .file-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; border-bottom: 1px solid var(--border); }
-        .file-item:last-child { border-bottom: none; }
-        .file-info { display: flex; align-items: center; gap: 12px; font-size: 0.95em; overflow: hidden; }
         .file-type-badge { font-weight: bold; color: white; font-size: 0.7em; background: var(--primary); padding: 3px 8px; border-radius: 5px; text-transform: uppercase; }
-        .delete-btn { color: var(--danger); cursor: pointer; font-weight: bold; padding: 5px 12px; border-radius: 6px; transition: 0.2s; }
-        .delete-btn:hover { background: #ffebeb; }
-
-        /* アクションエリア */
         .action-area { display: none; background: #f8f9fa; padding: 30px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 40px; }
         .btn-group { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 15px; }
         button { padding: 14px 24px; font-size: 15px; cursor: pointer; border: none; border-radius: 10px; font-weight: bold; transition: 0.3s; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .btn-png { background: var(--success); }
-        .btn-jpg, .btn-jpeg { background: var(--warning); }
-        .btn-clear { background: #adb5bd; font-size: 13px; padding: 10px 20px; margin-top: 10px; box-shadow: none; }
-        button:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
-        button:disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
-
-        /* SEO・解説コンテンツ */
+        .btn-png { background: var(--success); } .btn-jpg, .btn-jpeg { background: var(--warning); }
+        .btn-clear { background: #adb5bd; font-size: 13px; padding: 10px 20px; box-shadow: none; margin-top: 10px; }
         .seo-content { text-align: left; margin-top: 60px; padding-top: 40px; border-top: 2px solid var(--border); color: #444; }
         .seo-content h2 { font-size: 1.5em; color: #222; border-left: 6px solid var(--primary); padding-left: 15px; margin: 30px 0 15px 0; }
-        .seo-content h3 { font-size: 1.2em; color: #333; margin-top: 25px; }
-        .seo-content p { margin-bottom: 15px; font-size: 1.05em; }
-        .seo-content ul { padding-left: 20px; }
-        .seo-content li { margin-bottom: 10px; }
-
-        /* プライバシーポリシー */
         .policy-section { background: #f1f3f5; padding: 25px; border-radius: 10px; font-size: 0.9em; margin-top: 40px; }
-        
         footer { margin-top: 50px; font-size: 0.9em; color: #888; border-top: 1px solid var(--border); padding-top: 20px; }
     </style>
 </head>
 <body>
-
 <div class="main-wrapper">
     <aside class="ad-sidebar">広告スペース<br>(Google AdSense)</aside>
-
     <main class="container">
         <header>
             <h1>画像変換くん</h1>
             <p>プライバシーを保護しながら、ブラウザ内で一括変換</p>
         </header>
-        
         <label id="drop-label" for="fileElem">
-            <strong>ファイルをここにドロップ</strong><br>
-            またはクリックしてファイルを選択<br>
-            <span style="font-size: 0.85em; color: #666; margin-top: 10px; display: block;">（PNG, JPG, JPEGに対応 / 複数選択可）</span>
+            <strong>ファイルをここにドロップ</strong><br>またはクリックしてファイルを選択
             <input type="file" id="fileElem" accept="image/jpeg, image/png" multiple style="display:none">
         </label>
-
         <div id="status">ファイルを選択してください</div>
-
         <div id="file-list"></div>
-        <div style="text-align: center;">
-            <button id="clear-btn" class="btn-clear" style="display:none" onclick="clearAll()">リストをリセット</button>
-        </div>
-
+        <button id="clear-btn" class="btn-clear" style="display:none" onclick="clearAll()">リストをリセット</button>
         <div id="action-area" class="action-area">
             <p style="margin: 0; font-weight: bold;">一括変換先の形式を選択：</p>
             <div class="btn-group">
@@ -141,205 +53,81 @@
                 <button id="to-jpg" class="btn-jpg" onclick="runConversion('image/jpeg', 'jpg')">全てJPGに変換</button>
                 <button id="to-jpeg" class="btn-jpeg" onclick="runConversion('image/jpeg', 'jpeg')">全てJPEGに変換</button>
             </div>
-            <p id="zip-note" style="font-size: 0.8em; color: #888; margin-top: 15px; display: none;">
-                ※4枚以上の画像はZIPファイルにまとめてダウンロードされます。
-            </p>
         </div>
-
         <article class="seo-content">
             <h2>画像変換くんとは？</h2>
             <p>「画像変換くん」は、JPG、JPEG、PNG形式の画像をオンラインで手軽に相互変換できる無料ツールです。最新のWebテクノロジーを活用し、従来のツールにはない安全性とスピードを両立しました。</p>
-
-            <h3>1. 究極のプライバシー保護</h3>
-            <p>一般的なオンライン変換サービスとは異なり、当サイトでは<strong>画像をサーバーへアップロードすることは一切ありません。</strong>すべての処理は、お客様が今お使いのブラウザ内部（クライアントサイド）で完結します。機密文書や個人情報を含む写真も、外部に漏洩する心配なく安心してご利用いただけます。</p>
-
-            <h3>2. 爆速の一括処理と並列実行</h3>
-            <p>効率的なアルゴリズムを採用。JavaScriptの非同期並列処理（Promise.all）により、複数の画像を同時に処理します。また、4枚以上の画像を変換する際は自動的にZIPアーカイブを作成。大量の画像ダウンロードに伴う手間を大幅に削減します。</p>
-
-            <h3>3. インストール・登録不要</h3>
-            <p>ブラウザさえあれば、PC、スマートフォン、タブレットのいずれからでも即座に利用可能です。面倒なソフトウェアのインストールや、メールアドレスの登録などは一切必要ありません。</p>
-
-            <h3>技術的な仕組み</h3>
-            <p>当ツールは、HTML5のCanvas APIを使用してピクセルデータを動的に再描画し、指定されたMIMEタイプへエクスポートしています。サーバーリソースを消費しないため、地球環境にも優しい設計（エッジコンピューティング）となっています。</p>
-
+            <h3>1. サーバーへ送信しない究極のプライバシー保護</h3>
+            <p>当サイトの最大の特徴は、<strong>画像をサーバーへアップロードしない</strong>ことです。すべての処理はお使いのブラウザ内部（クライアントサイド）で完結します。機密文書や個人情報を含む写真も、外部に漏洩する心配なく安心してご利用いただけます。</p>
+            <h3>2. 爆速の一括処理とZIPダウンロード</h3>
+            <p>情報科学に基づいた効率的な並列処理アルゴリズムを採用。複数の画像を同時に変換し、4枚以上の場合は自動でZIPアーカイブを作成。手間を最小限に抑えます。</p>
             <section class="policy-section" id="policy">
                 <h3 style="margin-top: 0;">プライバシーポリシー</h3>
-                <p><strong>データの取り扱い：</strong>当サイトで処理される画像データは、利用者のデバイス内でのみ処理されます。当社が利用者の画像データを取得、閲覧、保存することはありません。</p>
-                <p><strong>広告配信：</strong>当サイトでは、第三者配信による広告サービス（Googleアドセンス）を利用しています。ユーザーの興味に応じた広告を表示するため、Cookie（クッキー）を使用することがあります。これに個人を特定する情報は含まれません。</p>
+                <p>当サイトではGoogleアドセンスを利用し広告を配信しています。ユーザーの興味に応じた広告を表示するため、Cookieを使用することがあります。画像データは一切収集・保存されません。</p>
             </section>
         </article>
-
-        <footer>
-            <p>© 2026 画像変換くん | すべての画像処理はローカルで実行されます</p>
-        </footer>
+        <footer><p>© 2026 画像変換くん | ローカル実行型ツール</p></footer>
     </main>
-
     <aside class="ad-sidebar">広告スペース<br>(Google AdSense)</aside>
 </div>
-
 <script>
     let filesArray = [];
-    const dropLabel = document.getElementById('drop-label');
     const fileElem = document.getElementById('fileElem');
-    const status = document.getElementById('status');
-
-    // --- ドラッグ＆ドロップ制御 (デフォルト挙動防止) ---
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eName => {
-        dropLabel.addEventListener(eName, e => { e.preventDefault(); e.stopPropagation(); }, false);
-    });
-
-    ['dragenter', 'dragover'].forEach(eName => {
-        dropLabel.addEventListener(eName, () => dropLabel.classList.add('highlight'), false);
-    });
-    ['dragleave', 'drop'].forEach(eName => {
-        dropLabel.addEventListener(eName, () => dropLabel.classList.remove('highlight'), false);
-    });
-
-    // ドロップ時の処理
-    dropLabel.addEventListener('drop', (e) => {
-        handleFiles(e.dataTransfer.files);
-    }, false);
-
-    // クリック（ファイル選択）時の処理
-    fileElem.addEventListener('change', (e) => {
-        handleFiles(e.target.files);
-    });
-
+    const dropLabel = document.getElementById('drop-label');
+    ['dragenter','dragover','dragleave','drop'].forEach(e => dropLabel.addEventListener(e, x => { x.preventDefault(); x.stopPropagation(); }, false));
+    dropLabel.addEventListener('drop', e => handleFiles(e.dataTransfer.files), false);
+    fileElem.addEventListener('change', e => handleFiles(e.target.files));
     function handleFiles(files) {
-        const newFiles = Array.from(files).filter(f => f.type === 'image/png' || f.type === 'image/jpeg');
-        if (newFiles.length === 0 && files.length > 0) {
-            alert("PNGまたはJPG/JPEGファイルを選択してください。");
-            return;
-        }
-        filesArray = filesArray.concat(newFiles);
+        filesArray = filesArray.concat(Array.from(files).filter(f => f.type.startsWith('image/')));
         updateUI();
     }
-
-    function removeFile(index) {
-        filesArray.splice(index, 1);
-        updateUI();
-    }
-
-    function clearAll() {
-        filesArray = [];
-        fileElem.value = "";
-        updateUI();
-    }
-
+    function clearAll() { filesArray = []; fileElem.value = ""; updateUI(); }
+    function removeFile(i) { filesArray.splice(i, 1); updateUI(); }
     function updateUI() {
         const list = document.getElementById('file-list');
-        const action = document.getElementById('action-area');
-        const clearBtn = document.getElementById('clear-btn');
-        const zipNote = document.getElementById('zip-note');
-
-        list.innerHTML = "";
-        
-        if (filesArray.length > 0) {
-            action.style.display = "block";
-            clearBtn.style.display = "inline-block";
-            status.innerText = `${filesArray.length} 個のファイルが読み込まれました`;
-            zipNote.style.display = filesArray.length >= 4 ? "block" : "none";
-
-            filesArray.forEach((file, index) => {
-                const item = document.createElement('div');
-                item.className = 'file-item';
-                const extLabel = file.type.includes('png') ? 'PNG' : 'JPG';
-                item.innerHTML = `
-                    <div class="file-info">
-                        <span class="file-type-badge">${extLabel}</span>
-                        <span title="${file.name}">${file.name}</span>
-                    </div>
-                    <span class="delete-btn" onclick="removeFile(${index})">削除</span>
-                `;
-                list.appendChild(item);
-            });
-            updateButtons();
+        list.innerHTML = filesArray.map((f, i) => `
+            <div class="file-item">
+                <div class="file-info"><span class="file-type-badge">${f.type.split('/')[1]}</span>${f.name}</div>
+                <span class="delete-btn" onclick="removeFile(${i})">削除</span>
+            </div>`).join('');
+        document.getElementById('action-area').style.display = filesArray.length ? 'block' : 'none';
+        document.getElementById('clear-btn').style.display = filesArray.length ? 'inline-block' : 'none';
+        document.getElementById('status').innerText = filesArray.length ? `${filesArray.length}個のファイルを選択中` : "ファイルを選択してください";
+    }
+    async function runConversion(mime, ext) {
+        const results = await Promise.all(filesArray.map(f => processFile(f, mime, ext)));
+        if (results.length >= 4) {
+            const zip = new JSZip();
+            results.forEach(r => zip.file(r.name, r.dataUrl.split(',')[1], {base64: true}));
+            const content = await zip.generateAsync({type:"blob"});
+            saveAs(content, `converted_${Date.now()}.zip`);
         } else {
-            action.style.display = "none";
-            clearBtn.style.display = "none";
-            status.innerText = "ファイルを選択してください";
+            results.forEach(r => saveAs(r.dataUrl, r.name));
         }
     }
-
-    function updateButtons() {
-        const btnPng = document.getElementById('to-png');
-        const btnJpg = document.getElementById('to-jpg');
-        const btnJpeg = document.getElementById('to-jpeg');
-
-        const allPng = filesArray.every(f => f.type === 'image/png');
-        const allJpg = filesArray.every(f => f.name.toLowerCase().endsWith('.jpg'));
-        const allJpeg = filesArray.every(f => f.name.toLowerCase().endsWith('.jpeg'));
-
-        btnPng.style.display = allPng ? "none" : "inline-block";
-        btnJpg.style.display = allJpg ? "none" : "inline-block";
-        btnJpeg.style.display = allJpeg ? "none" : "inline-block";
-    }
-
-    async function runConversion(mime, extension) {
-        status.innerText = "変換処理中... ブラウザを閉じないでください";
-        const buttons = document.querySelectorAll('.btn-group button');
-        buttons.forEach(b => b.disabled = true);
-
-        try {
-            // 並列処理開始
-            const results = await Promise.all(filesArray.map(file => processFile(file, mime, extension)));
-
-            if (filesArray.length >= 4) {
-                const zip = new JSZip();
-                results.forEach(res => {
-                    zip.file(res.name, res.dataUrl.split(',')[1], {base64: true});
-                });
-                const content = await zip.generateAsync({type:"blob"});
-                const url = URL.createObjectURL(content);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `images_converted_${Date.now()}.zip`;
-                a.click();
-                URL.revokeObjectURL(url);
-            } else {
-                results.forEach(res => {
-                    const link = document.createElement('a');
-                    link.href = res.dataUrl;
-                    link.download = res.name;
-                    link.click();
-                });
-            }
-            status.innerText = "完了しました！";
-        } catch (e) {
-            console.error(e);
-            status.innerText = "処理中にエラーが発生しました。";
-        } finally {
-            buttons.forEach(b => b.disabled = false);
-        }
-    }
-
-    function processFile(file, mime, extension) {
-        return new Promise((resolve) => {
+    function processFile(file, mime, ext) {
+        return new Promise(res => {
             const reader = new FileReader();
             reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
+                    canvas.width = img.width; canvas.height = img.height;
                     const ctx = canvas.getContext('2d');
-                    if (mime === 'image/jpeg') {
-                        ctx.fillStyle = "#FFFFFF";
-                        ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    }
+                    if(mime === 'image/jpeg'){ ctx.fillStyle = "#FFF"; ctx.fillRect(0,0,canvas.width,canvas.height); }
                     ctx.drawImage(img, 0, 0);
-                    // 画質0.9で出力
-                    const dataUrl = canvas.toDataURL(mime, 0.9);
-                    const baseName = file.name.substring(0, file.name.lastIndexOf('.'));
-                    resolve({ dataUrl, name: `${baseName}.${extension}` });
+                    res({ dataUrl: canvas.toDataURL(mime, 0.9), name: file.name.split('.')[0] + '.' + ext });
                 };
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         });
     }
+    function saveAs(data, name) {
+        const a = document.createElement('a');
+        a.href = typeof data === 'string' ? data : URL.createObjectURL(data);
+        a.download = name; a.click();
+    }
 </script>
-
 </body>
-
 </html>
